@@ -2,38 +2,36 @@ package com.example.bighead.sunshine.app;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 
 public class DetailActivity extends ActionBarActivity {
 
-
+    private static final String DETAILFRAGMENT_TAG = DetailFragment.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         if (savedInstanceState == null) {
+
+            //This is the entry point to enter DetailFragment,
+            //Remember that you should always use setArgument to send data to fragment.
+            //Because layout is one pane layout, this intent is passed here to open DetailActivity.
+            Bundle args = new Bundle();
+            args.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
+
+            DetailFragment detailFragment = new DetailFragment();
+            detailFragment.setArguments(args);
+
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new DetailFragment())
+                    .add(R.id.weather_detail_container, detailFragment, DETAILFRAGMENT_TAG)
                     .commit();
         }
-
-
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -61,61 +59,19 @@ public class DetailActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class DetailFragment extends Fragment {
-
-        private ShareActionProvider mshareActionProvider;
-        private String mforecastStr;
-        private static final String FORCAST_SHARE_HASHTAG = " #SunshineApp";
-        private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-
-        public DetailFragment() {
-            setHasOptionsMenu(true);
-        }
-
-        private Intent createShareForcastIntent(){
-
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-            intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_TEXT, mforecastStr+FORCAST_SHARE_HASHTAG);
-            return intent;
-        }
-
-        @Override
-        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-            //super.onCreateOptionsMenu(menu, inflater);
-
-            inflater.inflate(R.menu.menu_share_action_provider, menu);
-            MenuItem shareItem = menu.findItem(R.id.menu_item_share);
-            mshareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
-
-            if(mshareActionProvider != null){
-                mshareActionProvider.setShareIntent(createShareForcastIntent());
-            }else{
-                Log.e(LOG_TAG, "Share Action Provider is null?");
-            }
-
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-
-            Intent intent = getActivity().getIntent();
-            if(intent != null && intent.hasExtra(Intent.EXTRA_TEXT)){
-                mforecastStr = intent.getStringExtra(Intent.EXTRA_TEXT);
-                TextView textView = (TextView)rootView.findViewById(R.id.detail_text_view);
-                textView.setText(mforecastStr);
-            }
-
-
-            return rootView;
-        }
+    @Override
+    protected void onStart(){
+        super.onStart();
+        Log.v("DetailActivity", "test onStart");
+//
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        String temperatureUnit = sharedPreferences.getString(getString(R.string.pref_temperature_unit_key) , "Metric");
     }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.v("DetailActivity", "test onResume");
+    }
+
 }

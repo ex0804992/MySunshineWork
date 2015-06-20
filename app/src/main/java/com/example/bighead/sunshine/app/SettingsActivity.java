@@ -1,10 +1,14 @@
 package com.example.bighead.sunshine.app;
 
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
  * <p>
@@ -31,6 +35,15 @@ public class SettingsActivity extends PreferenceActivity
      * Attaches a listener so the summary is always updated with the preference value.
      * Also fires the listener once, to initialize the summary (so it shows up before the value
      * is changed.)
+     *
+     * summary is the presentation of UI before you click specific preference.
+     * example:
+     *      (when you click menu settings you will see...)
+     *      Location
+     *      94043       <---- this is summary
+     *      -----------
+     *      Temperature units
+     *      Metric      <---- this is summary
      */
     private void bindPreferenceSummaryToValue(Preference preference) {
 // Set the listener to watch for value changes.
@@ -41,6 +54,7 @@ public class SettingsActivity extends PreferenceActivity
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
+
     }
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
@@ -58,5 +72,24 @@ public class SettingsActivity extends PreferenceActivity
             preference.setSummary(stringValue);
         }
         return true;
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        startActivity(getParentActivityIntent());
+    }
+
+//    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+//    @Override
+//    public Intent getParentActivityIntent() {
+//        return super.getParentActivityIntent();
+////        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) // I do not know WHY this can't work.
+//    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @Override
+    public Intent getParentActivityIntent() {
+        return super.getParentActivityIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 }
