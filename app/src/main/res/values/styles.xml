@@ -6,8 +6,8 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="choiceMakeStyle">
-        <item name="android:background">@color/sunshine_light_blue</item>
+    <style name="ForecastListStyle">
+        <!-- If the device width is wide enough, then choose value-sw600dp instead. -->
     </style>
 
 </resources>
