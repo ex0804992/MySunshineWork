@@ -1,6 +1,7 @@
 package com.example.bighead.sunshine.app;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,8 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.bighead.sunshine.app.data.WeatherContract;
-
-import java.util.List;
+import com.example.bighead.sunshine.app.service.SunshineService;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -43,10 +43,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private ListView mListView;
-    private int mPosition = ListView.INVALID_POSITION;
-    private static final String SELECTED_KEY = "selected_position";
+    private int mPosition = ListView.INVALID_POSITION;  //Use to record user selected position of view of list
+    private static final String SELECTED_KEY = "selected_position"; //Use to retrieve data saved in savedInstanceState bundle.
+    private boolean mUseTodayLayout = true;     //Use to decide whether to use special Today Layout or not.
     private ForecastAdapter mForecastAdapter;
-    private static final int FORECAST_LOADER = 0;
+    private static final int FORECAST_LOADER = 0;   //Loader's tag to determine which loader we use.
     private static final String[] FORECAST_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
             // the content provider joins the location & weather tables in the background
@@ -114,9 +115,32 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         // Swap the new cursor in.  (The framework will take care of closing the
         // old cursor once we return.)
         mForecastAdapter.swapCursor(data);
+
         //set listView to selected position when activity is recreated after destroyed.
         if(mPosition != ListView.INVALID_POSITION) {
             mListView.smoothScrollToPosition(mPosition);
+            mListView.setItemChecked(mPosition, true);      //This name makes me confuse, but this function is what we are looking for.
+                                                            //use setItemChecked() to set android:state_activated="true".
+        }else{
+            //mPosition == ListView.INVALID_POSITION shows that list view is just initialized.
+            //So, we pre selected the first item.
+            //Most important, We should wait the listView to be populated by mForecastAdapter, or it will fail.
+            if(getActivity().findViewById(R.id.weather_detail_container) != null) {
+                final int firstPosition = mListView.getFirstVisiblePosition();
+                final View firstItem = mListView.getChildAt(firstPosition);
+
+
+//                new Handler().post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mListView.performItemClick(
+//                                firstItem,
+//                                firstPosition,
+//                                mListView.getAdapter().getItemId(firstPosition));
+//                    }
+//                });
+
+            }
         }
      }
 
@@ -151,6 +175,45 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     }
 
+    /**
+     * use to set mUseTodayLayout member variable.
+     * If we choose true, we use special today layout(common in one pane layout) in listview's adapter.
+     * Choose false when we want to use normal today layout(in two pane layout) in listview's adapter.
+     * **/
+    public void setUseTodayLayout(boolean useTodayLayout){
+        mUseTodayLayout = useTodayLayout;
+        if(mForecastAdapter != null){
+            mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
+        }
+    }
+
+//Find Why I can't do all work in onresume.
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//
+//
+//            if (mPosition == ListView.INVALID_POSITION && getActivity().findViewById(R.id.weather_detail_container) != null) {
+//                final int firstPosition = mListView.getFirstVisiblePosition();
+//                final View firstItem = mListView.getChildAt(firstPosition);
+//                Log.e("ONRESUME", "in onresume");
+//                mListView.performItemClick(firstItem, firstPosition, mForecastAdapter.getItemId(firstPosition));
+//                mPosition = firstPosition;
+//
+////                new Handler().post(new Runnable() {
+////                    @Override
+////                    public void run() {
+////                        mListView.performItemClick(
+////                                firstItem,
+////                                firstPosition,
+////                                mListView.getAdapter().getItemId(firstPosition));
+////                    }
+////                });
+//
+//            }
+//
+//    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
@@ -183,6 +246,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             }
         });
 
+
+
         // If there's instance state, mine it for useful information.
         // The end-goal here is that the user never knows that turning their device sideways
         // does crazy lifecycle related things.  It should feel like some stuff stretched out,
@@ -193,6 +258,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             // swap out in onLoadFinished.
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
         }
+
+        //Because mForecastAdapter is initialized here, so we call setUseTodayLayout() as default setting.
+        //We don't know whether onCreateView is completed precedes Activity's onCreate, So we call setUseTodayLayout here
+        //and in Activity's onCreate.
+        mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
 
         return rootView;
     }
@@ -217,7 +287,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         //tell app framework this fragment want to populate in menu option.
         //So, app framework will call corresponding method like "onCreateOptionsMenu".
         setHasOptionsMenu(true);
-
     }
 
     @Override
@@ -255,7 +324,10 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 //        new FetchWeatherTask().execute(postcode, temperatureUnit);
 
 //      The initial version has been replaced by cursor loader and cursorAdapter
-        new FetchWeatherTask(getActivity()).execute(location);
+        Intent intent = new Intent(getActivity(), SunshineService.class);
+        intent.putExtra("Location", location);
+        getActivity().startService(intent);
+        //new FetchWeatherTask(getActivity()).execute(location);
     }
 
     public void onLocationChanged(){

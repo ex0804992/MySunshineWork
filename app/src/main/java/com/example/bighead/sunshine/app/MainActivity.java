@@ -54,9 +54,17 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
                         .add(R.id.weather_detail_container, new DetailFragment(), DETAILFRAGMENT_TAG)
                         .commit();
             }
+
         }else{
             mTwoPane = false;
+            getSupportActionBar().setElevation(0f);
         }
+
+        //If we are in "TwoPane" mode, we use normal today layout in the forecastFragment's adapter of list view.
+        ForecastFragment forecastFragment = (ForecastFragment)getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_forecast);
+        forecastFragment.setUseTodayLayout(!mTwoPane);
+
     }
 
     @Override

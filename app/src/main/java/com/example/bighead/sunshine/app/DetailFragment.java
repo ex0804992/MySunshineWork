@@ -228,6 +228,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mPressureTextView.setText(pressureString);
         mIconView.setImageResource(iconId);
 
+        //Make mIconView more accessible.
+        mIconView.setContentDescription(descString);
         // We still need this for the share intent
         mforecast = String.format("%s - %s - %s/%s", dateString, descString, maxTemperatureString, minTemperatureString);
 

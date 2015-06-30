@@ -17,6 +17,8 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
+        <service android:name=".service.SunshineService" />
+
         <provider
             android:authorities="@string/content_authorities"
             android:name=".data.WeatherProvider"
@@ -28,7 +30,12 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
+            android:theme="@style/ForecastTheme"
             android:launchMode="singleTop"> <!--set launchMode to singleTop because we don't want mainActivity to be destroyed.-->
+            <!--android:configChanges="orientation|screenSize" is used to tell Android
+                "don't worry about orientation changes, I can handle it".
+                So, android won't destroy activity when device rotates.
+                But now, we use setItemChecked() to reach the same goal-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,6 +45,7 @@
         <activity
             android:name=".DetailActivity"
             android:label="@string/title_activity_detail"
+            android:theme="@style/AppTheme"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -46,6 +54,7 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
+            android:theme="@style/SettingTheme"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
