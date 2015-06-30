@@ -1,9 +1,11 @@
 package com.example.bighead.sunshine.app.service;
 
 import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -145,6 +147,7 @@ public class SunshineService extends IntentService {
         // If it exists, return the current ID
         // Otherwise, insert it using the content resolver and the base URI
 
+        //Services has its own context
         ContentResolver resolver = this.getContentResolver();   //contentResolver used to manipulate contentProvider.
         Uri locationUri = WeatherContract.LocationEntry.CONTENT_URI;    //The URI to ask for corresponding contentProvider
         Cursor cursor = null;
@@ -173,6 +176,24 @@ public class SunshineService extends IntentService {
             _id = ContentUris.parseId(locationInsertUri);
         }
         return _id;
+    }
+
+    /**
+     * AlarmReceiver
+     * **/
+    static public class AlarmReceiver extends BroadcastReceiver{
+
+        private static String LOG_TAG = "AlarmReceiver";
+
+        public AlarmReceiver() {
+            super();
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.v(LOG_TAG, "onReceive");
+
+        }
     }
 
     /**

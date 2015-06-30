@@ -17,8 +17,10 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
+        <!--Create service to do the background job-->
         <service android:name=".service.SunshineService" />
-
+        <!--Register alarmReceiver to receive AlarmManager's pendingIntent-->
+        <receiver android:name=".service.SunshineService$AlarmReceiver" android:enabled="true"/>
         <provider
             android:authorities="@string/content_authorities"
             android:name=".data.WeatherProvider"
