@@ -181,9 +181,9 @@ public class SunshineService extends IntentService {
     /**
      * AlarmReceiver
      * **/
-    static public class AlarmReceiver extends BroadcastReceiver{
+     public class AlarmReceiver extends BroadcastReceiver{
 
-        private static String LOG_TAG = "AlarmReceiver";
+        private String LOG_TAG = "AlarmReceiver";
 
         public AlarmReceiver() {
             super();
@@ -192,6 +192,8 @@ public class SunshineService extends IntentService {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.v(LOG_TAG, "onReceive");
+
+            onHandleIntent(intent);
 
         }
     }
